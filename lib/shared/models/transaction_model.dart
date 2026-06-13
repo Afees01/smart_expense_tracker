@@ -22,6 +22,62 @@ class TransactionModel {
     required this.category,
     required this.icon,
   });
+
+  factory TransactionModel.fromJson(Map<String, dynamic> json) {
+    final category = json['category']?.toString() ?? 'Other';
+    final typeString = json['type']?.toString().toLowerCase() ?? 'expense';
+
+    return TransactionModel(
+      id: json['id']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      subtitle: json['subtitle']?.toString() ?? '',
+      amount: (json['amount'] is num)
+          ? (json['amount'] as num).toDouble()
+          : double.tryParse(json['amount']?.toString() ?? '') ?? 0.0,
+      type: typeString == 'income'
+          ? TransactionType.income
+          : TransactionType.expense,
+      date: DateTime.tryParse(json['date']?.toString() ?? '') ?? DateTime.now(),
+      category: category,
+      icon: iconForCategory(category),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'subtitle': subtitle,
+      'amount': amount,
+      'type': type.name,
+      'date': date.toIso8601String(),
+      'category': category,
+    };
+  }
+
+  static IconData iconForCategory(String category) {
+    final normalized = category.toLowerCase();
+
+    if (normalized.contains('groceries')) {
+      return Icons.shopping_bag_outlined;
+    }
+    if (normalized.contains('income')) {
+      return Icons.payments_outlined;
+    }
+    if (normalized.contains('transport') || normalized.contains('taxi')) {
+      return Icons.directions_car_outlined;
+    }
+    if (normalized.contains('shopping')) {
+      return Icons.home_repair_service_outlined;
+    }
+    if (normalized.contains('dining') || normalized.contains('food')) {
+      return Icons.restaurant_outlined;
+    }
+    if (normalized.contains('housing') || normalized.contains('rent')) {
+      return Icons.home_outlined;
+    }
+    return Icons.receipt_long_outlined;
+  }
 }
 
 // Sample data
