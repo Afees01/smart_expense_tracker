@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:smart_expense_tracker/features/auth/domain/repositories/auth_repository.dart';
+import 'package:smart_expense_tracker/features/auth/presentation/repositories/auth_repository.dart';
 import 'package:smart_expense_tracker/features/auth/presentation/bloc/bloc/auth_bloc.dart';
 import 'package:smart_expense_tracker/features/auth/presentation/bloc/bloc/auth_state.dart';
 import 'package:smart_expense_tracker/features/auth/presentation/screens/Loginscreen.dart';

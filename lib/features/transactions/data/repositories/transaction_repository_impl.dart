@@ -1,5 +1,5 @@
 import '../../../../shared/models/transaction_model.dart';
-import '../../domain/repositories/transaction_repository.dart';
+import '../../presentation/repositories/transaction_repository.dart';
 import '../datasources/transaction_remote_data_source.dart';
 
 class TransactionRepositoryImpl implements TransactionRepository {

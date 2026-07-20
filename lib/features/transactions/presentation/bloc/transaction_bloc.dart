@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../domain/usecases/get_transactions.dart';
+import '../../data/usecases/get_transactions.dart';
 import '../../../../shared/models/transaction_model.dart';
 import 'transaction_event.dart';
 import 'transaction_state.dart';

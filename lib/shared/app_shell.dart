@@ -6,7 +6,7 @@ import 'package:smart_expense_tracker/features/budgets/presentation/screens/budg
 import 'package:smart_expense_tracker/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:smart_expense_tracker/features/transactions/presentation/bloc/transaction_bloc.dart';
 import 'package:smart_expense_tracker/features/transactions/presentation/bloc/transaction_event.dart';
-import 'package:smart_expense_tracker/features/transactions/domain/usecases/get_transactions.dart';
+import 'package:smart_expense_tracker/features/transactions/data/usecases/get_transactions.dart';
 import 'package:smart_expense_tracker/features/transactions/data/repositories/transaction_repository_impl.dart';
 import 'package:smart_expense_tracker/features/transactions/data/datasources/transaction_remote_data_source.dart';
 import 'package:smart_expense_tracker/core/network/network_client.dart';

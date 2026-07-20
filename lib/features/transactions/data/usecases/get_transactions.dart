@@ -1,5 +1,5 @@
 import '../../../../shared/models/transaction_model.dart';
-import '../repositories/transaction_repository.dart';
+import '../../presentation/repositories/transaction_repository.dart';
 
 class GetTransactions {
   final TransactionRepository repository;
