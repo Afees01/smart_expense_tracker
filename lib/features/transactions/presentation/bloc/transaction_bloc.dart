@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:smart_expense_tracker/features/transactions/data/usecases/create_trasactions.dart';
 
 import '../../data/usecases/get_transactions.dart';
 import '../../../../shared/models/transaction_model.dart';
@@ -7,8 +8,10 @@ import 'transaction_state.dart';
 
 class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   final GetTransactions getTransactions;
+    final CreateTransaction createTransaction;
 
-  TransactionBloc({required this.getTransactions})
+
+  TransactionBloc({required this.getTransactions, required this.createTransaction})
       : super(TransactionInitial()) {
     on<LoadTransactions>(_onLoadTransactions);
     on<AddTransaction>(_onAddTransaction);
@@ -35,19 +38,50 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     }
   }
 
-  Future<void> _onAddTransaction(
+ Future<void> _onAddTransaction(
     AddTransaction event,
     Emitter<TransactionState> emit,
   ) async {
-    final currentState = state;
-    if (currentState is TransactionLoadSuccess) {
-      final updated = List<TransactionModel>.from(currentState.transactions)
-        ..insert(0, event.transaction);
-      emit(TransactionLoadSuccess(updated));
-    } else if (currentState is TransactionLoadFailure ||
-        currentState is TransactionInitial ||
-        currentState is TransactionLoadInProgress) {
-      emit(TransactionLoadSuccess([event.transaction]));
+    try {
+      // Send transaction to API
+      final createdTransaction =
+          await createTransaction(
+        title: event.transaction.title,
+        subtitle: event.transaction.subtitle,
+        amount: event.transaction.amount,
+        type: event.transaction.type,
+        date: event.transaction.date,
+        category: event.transaction.category,
+      );
+
+      // Add the API-created transaction to the current list
+      final currentState = state;
+
+      if (currentState is TransactionLoadSuccess) {
+        final updated =
+            List<TransactionModel>.from(
+          currentState.transactions,
+        )..insert(
+            0,
+            createdTransaction,
+          );
+
+        emit(
+          TransactionLoadSuccess(updated),
+        );
+      } else {
+        emit(
+          TransactionLoadSuccess(
+            [createdTransaction],
+          ),
+        );
+      }
+    } catch (error) {
+      emit(
+        TransactionLoadFailure(
+          error.toString(),
+        ),
+      );
     }
   }
 }

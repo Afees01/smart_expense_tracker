@@ -4,6 +4,7 @@ import 'package:smart_expense_tracker/features/add_transaction/presentation/scre
 import 'package:smart_expense_tracker/features/analytics/presentation/screens/analytics_screen.dart';
 import 'package:smart_expense_tracker/features/budgets/presentation/screens/budgets_screen.dart';
 import 'package:smart_expense_tracker/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:smart_expense_tracker/features/transactions/data/usecases/create_trasactions.dart';
 import 'package:smart_expense_tracker/features/transactions/presentation/bloc/transaction_bloc.dart';
 import 'package:smart_expense_tracker/features/transactions/presentation/bloc/transaction_event.dart';
 import 'package:smart_expense_tracker/features/transactions/data/usecases/get_transactions.dart';
@@ -27,15 +28,17 @@ class _AppShellState extends State<AppShell> {
   @override
   void initState() {
     super.initState();
-    _transactionBloc = TransactionBloc(
-      getTransactions: GetTransactions(
-        TransactionRepositoryImpl(
-          remoteDataSource: TransactionRemoteDataSource(
-            client: NetworkClient(),
-          ),
-        ),
-      ),
-    )..add(const LoadTransactions(limit: 1000, page: 1));
+final repository = TransactionRepositoryImpl(
+  remoteDataSource: TransactionRemoteDataSource(
+    client: NetworkClient(),
+  ),
+);
+
+_transactionBloc = TransactionBloc(
+  getTransactions: GetTransactions(repository),
+  createTransaction: CreateTransaction(repository),
+)
+    ..add(const LoadTransactions(limit: 1000, page: 1));
   }
 
   @override

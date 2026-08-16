@@ -27,4 +27,23 @@ class TransactionRepositoryImpl implements TransactionRepository {
       endDate: endDate,
     );
   }
+   @override
+  Future<TransactionModel> addTransaction({
+    required String title,
+    required String subtitle,
+    required double amount,
+    required TransactionType type,
+    required DateTime date,
+    required String category,
+  }) async {
+    return remoteDataSource.addTransaction(
+      title: title,
+      subtitle: subtitle,
+      amount: amount,
+      type: type,
+      date: date,
+      category: category,
+    );
+  }
+
 }

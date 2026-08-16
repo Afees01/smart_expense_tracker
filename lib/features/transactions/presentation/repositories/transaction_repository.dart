@@ -9,6 +9,15 @@ abstract class TransactionRepository {
     String? startDate,
     String? endDate,
   });
+
+  Future<TransactionModel> addTransaction({
+    required String title,
+    required String subtitle,
+    required double amount,
+    required TransactionType type,
+    required DateTime date,
+    required String category,
+  });
 }
 
 

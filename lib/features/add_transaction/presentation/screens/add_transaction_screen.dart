@@ -1,19 +1,25 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:smart_expense_tracker/core/constants/app_spacing.dart';
 import 'package:smart_expense_tracker/core/theme/app_colors.dart';
 import 'package:smart_expense_tracker/core/theme/app_text_styles.dart';
+
 import 'package:smart_expense_tracker/features/add_transaction/widgets/amount_input_field.dart';
 import 'package:smart_expense_tracker/features/add_transaction/widgets/receipt_upload_area.dart';
 import 'package:smart_expense_tracker/features/add_transaction/widgets/transaction_type_toggle.dart';
+
 import 'package:smart_expense_tracker/features/transactions/presentation/bloc/transaction_bloc.dart';
 import 'package:smart_expense_tracker/features/transactions/presentation/bloc/transaction_event.dart';
+
 import 'package:smart_expense_tracker/shared/models/transaction_model.dart';
 import 'package:smart_expense_tracker/shared/widgets/wealthflow_app_bar.dart';
 
 class AddTransactionScreen extends StatefulWidget {
-  const AddTransactionScreen({super.key});
+  const AddTransactionScreen({
+    super.key,
+  });
 
   @override
   State<AddTransactionScreen> createState() => _AddTransactionScreenState();
@@ -21,49 +27,192 @@ class AddTransactionScreen extends StatefulWidget {
 
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
   bool _isExpense = true;
+
   String? _selectedCategory;
   DateTime? _selectedDate;
+
+  final _titleController = TextEditingController();
+
   final _amountController = TextEditingController();
+
   final _descriptionController = TextEditingController();
 
-  final _categories = [
+  PlatformFile? selectedReceipt;
+
+  final List<String> _categories = [
     'Shopping',
-    'Food & Dining',
-    'Transportation',
-    'Housing',
+    'Food',
+    'Dining',
+    'Transport',
+    'Rent',
     'Entertainment',
-    'Healthcare',
-    'Income',
+    'Health',
+    'Bills',
+    'Salary',
+    'Investment',
+    'Education',
+    'Travel',
+    'Freelance',
+    'Other',
   ];
 
   @override
   void dispose() {
+    _titleController.dispose();
     _amountController.dispose();
     _descriptionController.dispose();
+
     super.dispose();
   }
+
+  // ============================================================
+  // DATE
+  // ============================================================
 
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.primary,
-              onPrimary: AppColors.onPrimary,
-              surface: AppColors.surface,
-            ),
-          ),
-          child: child!,
-        );
-      },
     );
-    if (picked != null) setState(() => _selectedDate = picked);
+
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
   }
+
+  // ============================================================
+  // SAVE
+  // ============================================================
+
+  void _saveTransaction() {
+    final title = _titleController.text.trim();
+
+    final subtitle = _descriptionController.text.trim();
+
+    final amount = double.tryParse(
+          _amountController.text.trim(),
+        ) ??
+        0.0;
+
+    final category = _selectedCategory ?? 'Other';
+
+    final date = _selectedDate ?? DateTime.now();
+
+    // -----------------------------
+    // Validate title
+    // -----------------------------
+
+    if (title.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Enter a transaction title',
+          ),
+        ),
+      );
+
+      return;
+    }
+
+    // -----------------------------
+    // Validate amount
+    // -----------------------------
+
+    if (amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Enter a valid amount',
+          ),
+        ),
+      );
+
+      return;
+    }
+
+    // -----------------------------
+    // Create model
+    // -----------------------------
+
+    final transaction = TransactionModel(
+      // Backend will generate ID
+      id: 0,
+
+      title: title,
+
+      subtitle: subtitle.isEmpty ? 'New transaction' : subtitle,
+
+      amount: amount,
+
+      type: _isExpense ? TransactionType.expense : TransactionType.income,
+
+      date: date,
+
+      category: category,
+    );
+
+    // -----------------------------
+    // Send to BLoC
+    // -----------------------------
+
+    context.read<TransactionBloc>().add(
+          AddTransaction(
+            transaction,
+          ),
+        );
+
+    // -----------------------------
+    // Clear form
+    // -----------------------------
+
+    _titleController.clear();
+    _amountController.clear();
+    _descriptionController.clear();
+
+    setState(() {
+      _selectedCategory = null;
+      _selectedDate = null;
+      _isExpense = true;
+      selectedReceipt = null;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Transaction saved',
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // RECEIPT
+  // ============================================================
+
+  Future<void> filePickerDemo() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: [
+        'jpg',
+        'jpeg',
+        'png',
+      ],
+    );
+
+    if (result != null) {
+      setState(() {
+        selectedReceipt = result.files.single;
+      });
+    }
+  }
+
+  // ============================================================
+  // BUILD
+  // ============================================================
 
   @override
   Widget build(BuildContext context) {
@@ -77,35 +226,83 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // TYPE
+
             TransactionTypeToggle(
               isExpense: _isExpense,
-              onToggle: (v) => setState(() => _isExpense = v),
+              onToggle: (value) {
+                setState(() {
+                  _isExpense = value;
+                });
+              },
             ),
-            const SizedBox(height: AppSpacing.stackLg),
 
-            // Form card
+            const SizedBox(
+              height: AppSpacing.stackLg,
+            ),
+
+            // FORM CARD
+
             Container(
-              padding: const EdgeInsets.all(AppSpacing.stackLg),
+              padding: const EdgeInsets.all(
+                AppSpacing.stackLg,
+              ),
               decoration: BoxDecoration(
                 color: AppColors.surfaceContainerLowest,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(
+                  12,
+                ),
                 boxShadow: const [
                   BoxShadow(
-                      color: Color(0x0D000000),
-                      blurRadius: 12,
-                      offset: Offset(0, 4)),
+                    color: Color(0x0D000000),
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
                 ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Amount
-                  Center(
-                    child: AmountInputField(controller: _amountController),
-                  ),
-                  const SizedBox(height: AppSpacing.stackLg),
+                  // TITLE
 
-                  // Category + Date row
+                  _FormField(
+                    label: 'Title',
+                    child: TextField(
+                      controller: _titleController,
+                      decoration: InputDecoration(
+                        hintText: 'e.g. Coffee Shop',
+                        filled: true,
+                        fillColor: AppColors.surfaceContainerLow,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                            8,
+                          ),
+                          borderSide: const BorderSide(
+                            color: AppColors.outlineVariant,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: AppSpacing.stackMd,
+                  ),
+
+                  // AMOUNT
+
+                  Center(
+                    child: AmountInputField(
+                      controller: _amountController,
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: AppSpacing.stackLg,
+                  ),
+
+                  // CATEGORY + DATE
+
                   Row(
                     children: [
                       Expanded(
@@ -113,52 +310,41 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                           label: 'Category',
                           child: DropdownButtonFormField<String>(
                             value: _selectedCategory,
-                            hint: Text(
+                            hint: const Text(
                               'Select Category',
-                              style: AppTextStyles.bodyMd.copyWith(
-                                color: AppColors.onSurfaceVariant,
-                              ),
                             ),
                             decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 14,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(
-                                    color: AppColors.outlineVariant),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(
-                                    color: AppColors.outlineVariant),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(
-                                  color: AppColors.primaryContainer,
-                                  width: 1.5,
-                                ),
-                              ),
                               filled: true,
                               fillColor: AppColors.surfaceContainerLow,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  8,
+                                ),
+                              ),
                             ),
-                            icon: const Icon(Icons.keyboard_arrow_down,
-                                color: AppColors.onSurfaceVariant),
-                            items: _categories
-                                .map((c) => DropdownMenuItem(
-                                      value: c,
-                                      child:
-                                          Text(c, style: AppTextStyles.bodyMd),
-                                    ))
-                                .toList(),
-                            onChanged: (v) =>
-                                setState(() => _selectedCategory = v),
+                            items: _categories.map(
+                              (
+                                category,
+                              ) {
+                                return DropdownMenuItem<String>(
+                                  value: category,
+                                  child: Text(
+                                    category,
+                                  ),
+                                );
+                              },
+                            ).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedCategory = value;
+                              });
+                            },
                           ),
                         ),
                       ),
-                      const SizedBox(width: AppSpacing.stackMd),
+                      const SizedBox(
+                        width: AppSpacing.stackMd,
+                      ),
                       Expanded(
                         child: _FormField(
                           label: 'Date',
@@ -171,9 +357,12 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                               ),
                               decoration: BoxDecoration(
                                 color: AppColors.surfaceContainerLow,
-                                borderRadius: BorderRadius.circular(8),
-                                border:
-                                    Border.all(color: AppColors.outlineVariant),
+                                borderRadius: BorderRadius.circular(
+                                  8,
+                                ),
+                                border: Border.all(
+                                  color: AppColors.outlineVariant,
+                                ),
                               ),
                               child: Row(
                                 children: [
@@ -182,17 +371,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                       _selectedDate != null
                                           ? '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'
                                           : 'Select Date',
-                                      style: AppTextStyles.bodyMd.copyWith(
-                                        color: _selectedDate != null
-                                            ? AppColors.onSurface
-                                            : AppColors.onSurfaceVariant,
-                                      ),
                                     ),
                                   ),
                                   const Icon(
                                     Icons.calendar_today_outlined,
                                     size: 18,
-                                    color: AppColors.onSurfaceVariant,
                                   ),
                                 ],
                               ),
@@ -202,156 +385,115 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.stackMd),
 
-                  // Description
+                  const SizedBox(
+                    height: AppSpacing.stackMd,
+                  ),
+
+                  // DESCRIPTION
+
                   _FormField(
                     label: 'Description',
                     child: TextField(
                       controller: _descriptionController,
                       maxLines: 2,
-                      style: AppTextStyles.bodyMd,
                       decoration: InputDecoration(
                         hintText: 'What was this for?',
-                        hintStyle: AppTextStyles.bodyMd.copyWith(
-                          color: AppColors.onSurfaceVariant,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 12,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              const BorderSide(color: AppColors.outlineVariant),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              const BorderSide(color: AppColors.outlineVariant),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(
-                            color: AppColors.primaryContainer,
-                            width: 1.5,
-                          ),
-                        ),
                         filled: true,
                         fillColor: AppColors.surfaceContainerLow,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                            8,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.stackMd),
 
-                  ReceiptUploadArea(onTap: filePickerDemo),
+                  const SizedBox(
+                    height: AppSpacing.stackMd,
+                  ),
+
+                  // RECEIPT
+
+                  ReceiptUploadArea(
+                    onTap: filePickerDemo,
+                    fileName: selectedReceipt?.name,
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: AppSpacing.stackLg),
 
-            // Save button
+            const SizedBox(
+              height: AppSpacing.stackLg,
+            ),
+
+            // SAVE BUTTON
+
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () {
-                  final amount = double.tryParse(_amountController.text) ?? 0.0;
-                  final category = _selectedCategory ?? 'Other';
-                  final date = _selectedDate ?? DateTime.now();
-                  final description = _descriptionController.text.trim();
-                  if (amount <= 0) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Enter a valid amount')),
-                    );
-                    return;
-                  }
-
-                  final transaction = TransactionModel(
-                    id: DateTime.now().microsecondsSinceEpoch,
-                    title: category,
-                    subtitle:
-                        description.isEmpty ? 'New transaction' : description,
-                    amount: amount,
-                    type: _isExpense
-                        ? TransactionType.expense
-                        : TransactionType.income,
-                    date: date,
-                    category: category,
-                 
-                  );
-                  context
-                      .read<TransactionBloc>()
-                      .add(AddTransaction(transaction));
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Transaction saved')),
-                  );
-                  setState(() {
-                    _amountController.clear();
-                    _descriptionController.clear();
-                    _selectedCategory = null;
-                    _selectedDate = null;
-                    _isExpense = true;
-                  });
-                },
-                icon: const Icon(Icons.check_circle, size: 22),
-                label: const Text('Save Transaction'),
+                onPressed: _saveTransaction,
+                icon: const Icon(
+                  Icons.check_circle,
+                ),
+                label: const Text(
+                  'Save Transaction',
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryContainer,
                   foregroundColor: AppColors.onPrimary,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  textStyle: AppTextStyles.headlineMd,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
                   ),
-                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                      12,
+                    ),
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 80),
+
+            const SizedBox(
+              height: 80,
+            ),
           ],
         ),
       ),
     );
   }
-
-  PlatformFile? selectedReceipt;
-
-  Future<void> filePickerDemo() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['jpg', 'jpeg', 'png'],
-    );
-
-    if (result != null) {
-      setState(() {
-        selectedReceipt = result.files.single;
-      });
-
-      print('File name: ${selectedReceipt!.name}');
-      print('File path: ${selectedReceipt!.path}');
-      print('File size: ${selectedReceipt!.size}');
-    }
-  }
 }
+
+// ============================================================
+// FORM FIELD
+// ============================================================
 
 class _FormField extends StatelessWidget {
   final String label;
   final Widget child;
 
-  const _FormField({required this.label, required this.child});
+  const _FormField({
+    required this.label,
+    required this.child,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style:
-              AppTextStyles.labelMd.copyWith(color: AppColors.onSurfaceVariant),
+          style: AppTextStyles.labelMd.copyWith(
+            color: AppColors.onSurfaceVariant,
+          ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(
+          height: 6,
+        ),
         child,
       ],
     );
