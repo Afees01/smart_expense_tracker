@@ -39,9 +39,7 @@ class RecentTransactionsSection extends StatelessWidget {
             ],
           ),
         ),
-
         const SizedBox(height: 8),
-
         if (transactions.isEmpty)
           _buildEmptyState()
         else
@@ -62,15 +60,13 @@ class RecentTransactionsSection extends StatelessWidget {
                 transactions.length,
                 (index) {
                   final transaction = transactions[index];
-                  final isLast =
-                      index == transactions.length - 1;
+                  final isLast = index == transactions.length - 1;
 
                   return Column(
                     children: [
                       _TransactionTile(
                         transaction: transaction,
                       ),
-
                       if (!isLast)
                         const Divider(
                           height: 1,
@@ -106,16 +102,12 @@ class RecentTransactionsSection extends StatelessWidget {
             size: 48,
             color: AppColors.onSurfaceVariant,
           ),
-
           const SizedBox(height: 12),
-
           Text(
             'No transactions yet',
             style: AppTextStyles.bodyLg,
           ),
-
           const SizedBox(height: 4),
-
           Text(
             'Your recent transactions will appear here.',
             textAlign: TextAlign.center,
@@ -138,26 +130,17 @@ class _TransactionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isIncome =
-        transaction.type == TransactionType.income;
+    final bool isIncome = transaction.type == TransactionType.income;
 
-    final Color amountColor =
-        isIncome
-            ? AppColors.primary
-            : AppColors.error;
+    final Color amountColor = isIncome ? AppColors.primary : AppColors.error;
 
     final Color iconBg =
-        isIncome
-            ? AppColors.primaryContainer
-            : AppColors.secondaryContainer;
+        isIncome ? AppColors.primaryContainer : AppColors.secondaryContainer;
 
     final Color iconColor =
-        isIncome
-            ? AppColors.onPrimary
-            : AppColors.onSecondaryContainer;
+        isIncome ? AppColors.onPrimary : AppColors.onSecondaryContainer;
 
-    final IconData icon =
-        _getCategoryIcon(transaction.category);
+    final IconData icon = _getCategoryIcon(transaction.category);
 
     return Material(
       color: Colors.transparent,
@@ -182,13 +165,10 @@ class _TransactionTile extends StatelessWidget {
                   size: 20,
                 ),
               ),
-
               const SizedBox(width: 16),
-
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       transaction.title,
@@ -198,9 +178,7 @@ class _TransactionTile extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-
                     const SizedBox(height: 2),
-
                     Text(
                       transaction.subtitle.isNotEmpty
                           ? transaction.subtitle
@@ -214,9 +192,7 @@ class _TransactionTile extends StatelessWidget {
                   ],
                 ),
               ),
-
               const SizedBox(width: 12),
-
               Text(
                 '${isIncome ? '+' : '-'}\$${transaction.amount.toStringAsFixed(2)}',
                 style: AppTextStyles.numericData.copyWith(
@@ -235,6 +211,7 @@ class _TransactionTile extends StatelessWidget {
       case 'food':
       case 'restaurant':
       case 'grocery':
+      case 'dining':
         return Icons.restaurant;
 
       case 'shopping':
@@ -243,6 +220,11 @@ class _TransactionTile extends StatelessWidget {
       case 'transport':
       case 'transportation':
         return Icons.directions_car;
+      case 'freelance':
+        return Icons.work;
+
+      case 'other':
+        return Icons.category;
 
       case 'entertainment':
         return Icons.movie;

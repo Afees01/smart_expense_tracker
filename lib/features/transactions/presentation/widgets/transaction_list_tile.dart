@@ -15,25 +15,36 @@ class TransactionListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isIncome = transaction.type == TransactionType.income;
-    final amountColor = isIncome ? AppColors.primary : AppColors.error;
-    final iconBg = isIncome
+    final bool isIncome = transaction.type == TransactionType.income;
+
+    final Color amountColor = isIncome ? AppColors.primary : AppColors.error;
+
+    final Color iconBg = isIncome
         ? AppColors.primaryContainer.withOpacity(0.15)
         : AppColors.secondaryContainer.withOpacity(0.3);
-    final iconColor = isIncome ? AppColors.primaryContainer : AppColors.onSecondaryContainer;
+
+    final Color iconColor =
+        isIncome ? AppColors.primaryContainer : AppColors.onSecondaryContainer;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () {},
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
           child: Row(
             children: [
               CircleAvatar(
-                radius: 24,
+                radius: 22,
                 backgroundColor: iconBg,
-                //child: Icon(transaction., color: iconColor, size: 22),
+                child: Icon(
+                  _getCategoryIcon(transaction.category),
+                  color: iconColor,
+                  size: 22,
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -42,11 +53,19 @@ class TransactionListTile extends StatelessWidget {
                   children: [
                     Text(
                       transaction.title,
-                      style: AppTextStyles.bodyLg.copyWith(fontWeight: FontWeight.w600),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.bodyLg.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      transaction.subtitle,
+                      transaction.subtitle.isNotEmpty
+                          ? transaction.subtitle
+                          : transaction.category,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: AppTextStyles.labelMd.copyWith(
                         color: AppColors.onSurfaceVariant,
                       ),
@@ -54,17 +73,22 @@ class TransactionListTile extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
                     '${isIncome ? '+' : '-'}\$${transaction.amount.toStringAsFixed(2)}',
-                    style: AppTextStyles.numericData.copyWith(color: amountColor),
+                    style: AppTextStyles.numericData.copyWith(
+                      color: amountColor,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     timeLabel,
-                    style: AppTextStyles.labelMd.copyWith(color: AppColors.outline),
+                    style: AppTextStyles.labelMd.copyWith(
+                      color: AppColors.outline,
+                    ),
                   ),
                 ],
               ),
@@ -73,5 +97,57 @@ class TransactionListTile extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  IconData _getCategoryIcon(String category) {
+    switch (category.toLowerCase()) {
+      case 'food':
+      case 'restaurant':
+      case 'grocery':
+      case 'dining':
+        return Icons.restaurant;
+
+      case 'shopping':
+        return Icons.shopping_bag;
+
+      case 'transport':
+      case 'transportation':
+        return Icons.directions_car;
+
+      case 'entertainment':
+        return Icons.movie;
+
+      case 'bills':
+      case 'bill':
+        return Icons.receipt_long;
+
+      case 'health':
+      case 'medical':
+        return Icons.medical_services;
+
+      case 'home':
+      case 'rent':
+        return Icons.home;
+
+      case 'salary':
+        return Icons.account_balance_wallet;
+
+      case 'freelance':
+        return Icons.work;
+
+      case 'other':
+        return Icons.category;
+      case 'investment':
+        return Icons.trending_up;
+
+      case 'education':
+        return Icons.school;
+
+      case 'travel':
+        return Icons.flight;
+
+      default:
+        return Icons.receipt_long;
+    }
   }
 }

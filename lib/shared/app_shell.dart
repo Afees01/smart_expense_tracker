@@ -35,7 +35,7 @@ class _AppShellState extends State<AppShell> {
           ),
         ),
       ),
-    )..add(const LoadTransactions());
+    )..add(const LoadTransactions(limit: 1000, page: 1));
   }
 
   @override
