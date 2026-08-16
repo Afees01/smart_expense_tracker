@@ -35,7 +35,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
 
     return transactions.where((transaction) {
       if (_filterType == TransactionFilterType.income &&
-          transaction.type != TransactionType.income) {
+          transaction.type !=TransactionType .income) {
         return false;
       }
       if (_filterType == TransactionFilterType.expense &&
@@ -56,7 +56,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       builder: (context, state) {
         final transactions = state is TransactionLoadSuccess
             ? state.transactions
-            : sampleTransactions;
+            : <TransactionModel>[];
         final filteredTransactions = _filterTransactions(transactions);
 
         final today = filteredTransactions

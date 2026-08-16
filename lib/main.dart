@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:smart_expense_tracker/core/network/network_client.dart';
+import 'package:smart_expense_tracker/core/network/securetoken.dart';
+import 'package:smart_expense_tracker/features/auth/data/datasources/AuthRemoteDataSource.dart';
 import 'package:smart_expense_tracker/features/auth/presentation/repositories/auth_repository.dart';
 import 'package:smart_expense_tracker/features/auth/presentation/bloc/bloc/auth_bloc.dart';
 import 'package:smart_expense_tracker/features/auth/presentation/bloc/bloc/auth_state.dart';
@@ -17,11 +20,20 @@ void main() {
       statusBarIconBrightness: Brightness.dark,
     ),
   );
-  runApp(const WealthFlowApp());
+  final networkClient = NetworkClient();
+  final token = Securetoken();
+
+  runApp(WealthFlowApp(
+    client: networkClient,
+    token: token,
+  ));
 }
 
 class WealthFlowApp extends StatelessWidget {
-  const WealthFlowApp({super.key});
+  final NetworkClient client;
+  final Securetoken token;
+
+  const WealthFlowApp({super.key, required this.client, required this.token});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +41,10 @@ class WealthFlowApp extends StatelessWidget {
         providers: [
           BlocProvider(
             create: (_) => AuthBloc(
-              AuthRepository(),
+              AuthRepository(
+                  dataSource: AuthRemoteDataSource(
+                client,token
+              )),
             ),
           ),
         ],

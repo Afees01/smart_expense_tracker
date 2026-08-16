@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
+import 'package:smart_expense_tracker/core/theme/app_colors.dart';
+import 'package:smart_expense_tracker/core/theme/app_text_styles.dart';
 
 class ReceiptUploadArea extends StatelessWidget {
   final VoidCallback? onTap;
+  final String? fileName;
 
-  const ReceiptUploadArea({super.key, this.onTap});
+  const ReceiptUploadArea({
+    super.key,
+    this.onTap,
+    this.fileName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +19,9 @@ class ReceiptUploadArea extends StatelessWidget {
       children: [
         Text(
           'Attach Receipt',
-          style: AppTextStyles.labelMd.copyWith(color: AppColors.onSurfaceVariant),
+          style: AppTextStyles.labelMd.copyWith(
+            color: AppColors.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 8),
         GestureDetector(
@@ -28,7 +35,6 @@ class ReceiptUploadArea extends StatelessWidget {
               border: Border.all(
                 color: AppColors.outlineVariant,
                 width: 2,
-                style: BorderStyle.solid,
               ),
             ),
             child: Column(
@@ -39,15 +45,23 @@ class ReceiptUploadArea extends StatelessWidget {
                   color: AppColors.outline,
                 ),
                 const SizedBox(height: 8),
+
                 Text(
-                  'Click to upload photo',
-                  style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurfaceVariant),
+                  fileName ?? 'Click to upload photo',
+                  style: AppTextStyles.bodyMd.copyWith(
+                    color: AppColors.onSurfaceVariant,
+                  ),
                 ),
+
                 const SizedBox(height: 4),
-                Text(
-                  'PNG, JPG up to 10MB',
-                  style: AppTextStyles.labelMd.copyWith(color: AppColors.outlineVariant),
-                ),
+
+                if (fileName == null)
+                  Text(
+                    'PNG, JPG up to 10MB',
+                    style: AppTextStyles.labelMd.copyWith(
+                      color: AppColors.outlineVariant,
+                    ),
+                  ),
               ],
             ),
           ),

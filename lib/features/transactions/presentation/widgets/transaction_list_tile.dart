@@ -33,7 +33,7 @@ class TransactionListTile extends StatelessWidget {
               CircleAvatar(
                 radius: 24,
                 backgroundColor: iconBg,
-                child: Icon(transaction.icon, color: iconColor, size: 22),
+                //child: Icon(transaction., color: iconColor, size: 22),
               ),
               const SizedBox(width: 16),
               Expanded(

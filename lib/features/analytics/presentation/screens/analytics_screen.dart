@@ -143,7 +143,8 @@ class _ToggleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: GestureDetector(
-        onTap: () {},
+        onTap: () {
+        },
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: isSelected

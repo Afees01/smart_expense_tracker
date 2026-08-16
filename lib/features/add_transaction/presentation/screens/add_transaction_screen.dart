@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smart_expense_tracker/core/constants/app_spacing.dart';
@@ -10,7 +11,6 @@ import 'package:smart_expense_tracker/features/transactions/presentation/bloc/tr
 import 'package:smart_expense_tracker/features/transactions/presentation/bloc/transaction_event.dart';
 import 'package:smart_expense_tracker/shared/models/transaction_model.dart';
 import 'package:smart_expense_tracker/shared/widgets/wealthflow_app_bar.dart';
-
 
 class AddTransactionScreen extends StatefulWidget {
   const AddTransactionScreen({super.key});
@@ -90,7 +90,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 color: AppColors.surfaceContainerLowest,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
-                  BoxShadow(color: Color(0x0D000000), blurRadius: 12, offset: Offset(0, 4)),
+                  BoxShadow(
+                      color: Color(0x0D000000),
+                      blurRadius: 12,
+                      offset: Offset(0, 4)),
                 ],
               ),
               child: Column(
@@ -118,31 +121,40 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                             ),
                             decoration: InputDecoration(
                               contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 14,
+                                horizontal: 12,
+                                vertical: 14,
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: AppColors.outlineVariant),
+                                borderSide: const BorderSide(
+                                    color: AppColors.outlineVariant),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: AppColors.outlineVariant),
+                                borderSide: const BorderSide(
+                                    color: AppColors.outlineVariant),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 borderSide: const BorderSide(
-                                  color: AppColors.primaryContainer, width: 1.5,
+                                  color: AppColors.primaryContainer,
+                                  width: 1.5,
                                 ),
                               ),
                               filled: true,
                               fillColor: AppColors.surfaceContainerLow,
                             ),
-                            icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.onSurfaceVariant),
-                            items: _categories.map((c) => DropdownMenuItem(
-                              value: c,
-                              child: Text(c, style: AppTextStyles.bodyMd),
-                            )).toList(),
-                            onChanged: (v) => setState(() => _selectedCategory = v),
+                            icon: const Icon(Icons.keyboard_arrow_down,
+                                color: AppColors.onSurfaceVariant),
+                            items: _categories
+                                .map((c) => DropdownMenuItem(
+                                      value: c,
+                                      child:
+                                          Text(c, style: AppTextStyles.bodyMd),
+                                    ))
+                                .toList(),
+                            onChanged: (v) =>
+                                setState(() => _selectedCategory = v),
                           ),
                         ),
                       ),
@@ -154,12 +166,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                             onTap: _pickDate,
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 15,
+                                horizontal: 12,
+                                vertical: 15,
                               ),
                               decoration: BoxDecoration(
                                 color: AppColors.surfaceContainerLow,
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: AppColors.outlineVariant),
+                                border:
+                                    Border.all(color: AppColors.outlineVariant),
                               ),
                               child: Row(
                                 children: [
@@ -203,20 +217,24 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                           color: AppColors.onSurfaceVariant,
                         ),
                         contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 12,
+                          horizontal: 12,
+                          vertical: 12,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: AppColors.outlineVariant),
+                          borderSide:
+                              const BorderSide(color: AppColors.outlineVariant),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: AppColors.outlineVariant),
+                          borderSide:
+                              const BorderSide(color: AppColors.outlineVariant),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: const BorderSide(
-                            color: AppColors.primaryContainer, width: 1.5,
+                            color: AppColors.primaryContainer,
+                            width: 1.5,
                           ),
                         ),
                         filled: true,
@@ -226,7 +244,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   ),
                   const SizedBox(height: AppSpacing.stackMd),
 
-                  const ReceiptUploadArea(),
+                  ReceiptUploadArea(onTap: filePickerDemo),
                 ],
               ),
             ),
@@ -249,16 +267,21 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   }
 
                   final transaction = TransactionModel(
-                    id: DateTime.now().microsecondsSinceEpoch.toString(),
+                    id: DateTime.now().microsecondsSinceEpoch,
                     title: category,
-                    subtitle: description.isEmpty ? 'New transaction' : description,
+                    subtitle:
+                        description.isEmpty ? 'New transaction' : description,
                     amount: amount,
-                    type: _isExpense ? TransactionType.expense : TransactionType.income,
+                    type: _isExpense
+                        ? TransactionType.expense
+                        : TransactionType.income,
                     date: date,
                     category: category,
-                    icon: TransactionModel.iconForCategory(category),
+                 
                   );
-                  context.read<TransactionBloc>().add(AddTransaction(transaction));
+                  context
+                      .read<TransactionBloc>()
+                      .add(AddTransaction(transaction));
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Transaction saved')),
@@ -291,6 +314,25 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       ),
     );
   }
+
+  PlatformFile? selectedReceipt;
+
+  Future<void> filePickerDemo() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png'],
+    );
+
+    if (result != null) {
+      setState(() {
+        selectedReceipt = result.files.single;
+      });
+
+      print('File name: ${selectedReceipt!.name}');
+      print('File path: ${selectedReceipt!.path}');
+      print('File size: ${selectedReceipt!.size}');
+    }
+  }
 }
 
 class _FormField extends StatelessWidget {
@@ -306,7 +348,8 @@ class _FormField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: AppTextStyles.labelMd.copyWith(color: AppColors.onSurfaceVariant),
+          style:
+              AppTextStyles.labelMd.copyWith(color: AppColors.onSurfaceVariant),
         ),
         const SizedBox(height: 6),
         child,

@@ -1,4 +1,4 @@
-import '../../../../shared/models/transaction_model.dart';
+import 'package:smart_expense_tracker/shared/models/transaction_model.dart';
 import '../../presentation/repositories/transaction_repository.dart';
 
 class GetTransactions {
@@ -8,9 +8,19 @@ class GetTransactions {
 
   Future<List<TransactionModel>> call({
     int limit = 20,
-    String type = 'all',
-    String userId = '123',
+    int page = 1,
+    String? type,
+    String? category,
+    String? startDate,
+    String? endDate,
   }) {
-    return repository.getTransactions(limit: limit, type: type, userId: userId);
+    return repository.getTransactions(
+      limit: limit,
+      page: page,
+      type: type,
+      category: category,
+      startDate: startDate,
+      endDate: endDate,
+    );
   }
 }

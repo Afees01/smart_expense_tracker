@@ -1,51 +1,49 @@
-import 'dart:convert';
-
-import '../../../../core/network/network_client.dart';
-import '../../../../shared/models/transaction_model.dart';
+import 'package:smart_expense_tracker/core/network/network_client.dart';
+import 'package:smart_expense_tracker/shared/models/transaction_model.dart';
 
 class TransactionRemoteDataSource {
   final NetworkClient client;
 
-  TransactionRemoteDataSource({required this.client});
+  TransactionRemoteDataSource({
+    required this.client,
+  });
 
-  /// Fake API endpoint example:
-  /// https://api.example.com/transactions?userId=123&limit=20&type=all
-  ///
-  /// Request parameters:
-  /// - userId: id of the current user
-  /// - limit: number of transactions to return
-  /// - type: filter by transaction type ('all', 'income', 'expense')
   Future<List<TransactionModel>> fetchTransactions({
     int limit = 20,
-    String type = 'all',
-    String userId = '123',
+    int page = 1,
+    String? type,
+    String? category,
+    String? startDate,
+    String? endDate,
   }) async {
-    final uri = Uri.https(
-      'api.example.com',
-      '/transactions',
-      {
-        'userId': userId,
-        'limit': '$limit',
-        'type': type,
-      },
-    );
-
     final response = await client.get(
-      uri,
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer FAKE_TOKEN_123',
+      '/transactions',
+      queryparameters: {
+        'limit': limit,
+        'page': page,
+        if (type != null && type != 'all') 'type': type,
+        if (category != null) 'category': category,
+        if (startDate != null) 'startDate': startDate,
+        if (endDate != null) 'endDate': endDate,
       },
     );
 
-    if (response.statusCode != 200) {
-      throw Exception('Transaction API error: ${response.statusCode}');
+    final responseData = response.data;
+
+    if (responseData['success'] != true) {
+      throw Exception(
+        responseData['message'] ?? 'Failed to load transactions',
+      );
     }
 
-    final jsonList = jsonDecode(response.body) as List<dynamic>;
-    return jsonList
-        .map((jsonItem) =>
-            TransactionModel.fromJson(jsonItem as Map<String, dynamic>))
+    final List<dynamic> transactionData = responseData['data'] ?? [];
+
+    return transactionData
+        .map(
+          (json) => TransactionModel.fromJson(
+            Map<String, dynamic>.from(json),
+          ),
+        )
         .toList();
   }
 }

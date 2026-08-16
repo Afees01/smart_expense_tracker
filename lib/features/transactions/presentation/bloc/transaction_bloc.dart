@@ -23,8 +23,11 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     try {
       final transactions = await getTransactions(
         limit: event.limit,
+        page: event.page,
         type: event.type,
-        userId: event.userId,
+        category: event.category,
+        startDate: event.startDate,
+        endDate: event.endDate,
       );
       emit(TransactionLoadSuccess(transactions));
     } catch (error) {
