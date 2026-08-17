@@ -36,7 +36,8 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthAuthenticated) {
-            Navigator.pushReplacementNamed(context, '/home');
+            Navigator.pushNamedAndRemoveUntil(
+                context, '/home', (route) => false);
           }
           if (state is AuthFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -207,11 +208,42 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                             onPressed: isLoading
                                 ? null
                                 : () {
+                                    final password = passwordController.text;
+                                    final confirmPassword =
+                                        confirmPasswordController.text;
+
+                                    // Check password length
+                                    if (password.length < 8) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Password must be at least 8 characters',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+
+                                    // Check passwords match
+                                    if (password != confirmPassword) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Passwords do not match',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+
+                                    // Passwords are valid
                                     context.read<AuthBloc>().add(
                                           RegisterRequested(
                                             name: nameController.text.trim(),
                                             email: emailController.text.trim(),
-                                            password: passwordController.text,
+                                            password: password,
                                           ),
                                         );
                                   },

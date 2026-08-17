@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:smart_expense_tracker/shared/models/budget_model.dart';
+import 'package:smart_expense_tracker/features/budgets/data/models/budget_model.dart';
 
 abstract class BudgetState extends Equatable {
   const BudgetState();

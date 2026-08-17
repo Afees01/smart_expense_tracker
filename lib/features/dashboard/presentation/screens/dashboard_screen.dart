@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smart_expense_tracker/core/constants/app_spacing.dart';
 import 'package:smart_expense_tracker/features/transactions/presentation/bloc/transaction_bloc.dart';
 import 'package:smart_expense_tracker/features/transactions/presentation/bloc/transaction_state.dart';
-import 'package:smart_expense_tracker/shared/models/transaction_model.dart';
+import 'package:smart_expense_tracker/features/transactions/data/models/transaction_model.dart';
 import 'package:smart_expense_tracker/shared/widgets/wealthflow_app_bar.dart';
 
 import '../widgets/balance_hero_card.dart';

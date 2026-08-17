@@ -1,4 +1,4 @@
-import '../../../../shared/models/transaction_model.dart';
+import '../../data/models/transaction_model.dart';
 
 abstract class TransactionRepository {
   Future<List<TransactionModel>> getTransactions({

@@ -1,11 +1,35 @@
-import 'package:smart_expense_tracker/shared/models/budget_model.dart';
+import 'package:equatable/equatable.dart';
+import 'package:smart_expense_tracker/features/budgets/data/models/budget_model.dart';
 
-abstract class BudgetEvent {}
+abstract class BudgetEvent extends Equatable {
+  const BudgetEvent();
 
-class LoadBudgets extends BudgetEvent {}
+  @override
+  List<Object?> get props => [];
+}
+
+class LoadBudgets extends BudgetEvent {
+  final String? month;
+
+  const LoadBudgets({
+    this.month,
+  });
+
+  @override
+  List<Object?> get props => [
+        month,
+      ];
+}
 
 class AddBudget extends BudgetEvent {
   final BudgetModel budget;
 
-  AddBudget(this.budget);
+  const AddBudget(
+    this.budget,
+  );
+
+  @override
+  List<Object?> get props => [
+        budget,
+      ];
 }

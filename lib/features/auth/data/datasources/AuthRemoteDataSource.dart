@@ -42,4 +42,14 @@ class AuthRemoteDataSource {
       throw Exception("Registration failed: $e");
     }
   }
+  
+  Future<void> logout() async {
+    try {
+      await networkClient.post("/auth/logout", {});
+      await securetoken.deleteToken();
+    } catch (e) {
+      throw Exception("Logout failed: $e");
+    }
+  }
+
 }

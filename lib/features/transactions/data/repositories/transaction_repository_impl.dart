@@ -1,6 +1,6 @@
 import 'package:smart_expense_tracker/features/transactions/data/datasources/transaction_remote_data_source.dart';
 import 'package:smart_expense_tracker/features/transactions/presentation/repositories/transaction_repository.dart';
-import 'package:smart_expense_tracker/shared/models/transaction_model.dart';
+import 'package:smart_expense_tracker/features/transactions/data/models/transaction_model.dart';
 
 class TransactionRepositoryImpl implements TransactionRepository {
   final TransactionRemoteDataSource remoteDataSource;

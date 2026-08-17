@@ -1,5 +1,5 @@
 import 'package:smart_expense_tracker/core/network/network_client.dart';
-import 'package:smart_expense_tracker/shared/models/transaction_model.dart';
+import 'package:smart_expense_tracker/features/transactions/data/models/transaction_model.dart';
 
 class TransactionRemoteDataSource {
   final NetworkClient client;

@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smart_expense_tracker/features/transactions/data/usecases/create_trasactions.dart';
 
 import '../../data/usecases/get_transactions.dart';
-import '../../../../shared/models/transaction_model.dart';
+import '../../data/models/transaction_model.dart';
 import 'transaction_event.dart';
 import 'transaction_state.dart';
 

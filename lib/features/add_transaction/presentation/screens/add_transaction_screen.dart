@@ -13,7 +13,7 @@ import 'package:smart_expense_tracker/features/add_transaction/widgets/transacti
 import 'package:smart_expense_tracker/features/transactions/presentation/bloc/transaction_bloc.dart';
 import 'package:smart_expense_tracker/features/transactions/presentation/bloc/transaction_event.dart';
 
-import 'package:smart_expense_tracker/shared/models/transaction_model.dart';
+import 'package:smart_expense_tracker/features/transactions/data/models/transaction_model.dart';
 import 'package:smart_expense_tracker/shared/widgets/wealthflow_app_bar.dart';
 
 class AddTransactionScreen extends StatefulWidget {

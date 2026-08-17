@@ -41,10 +41,7 @@ class WealthFlowApp extends StatelessWidget {
         providers: [
           BlocProvider(
             create: (_) => AuthBloc(
-              AuthRepository(
-                  dataSource: AuthRemoteDataSource(
-                client,token
-              )),
+              AuthRepository(dataSource: AuthRemoteDataSource(client, token)),
             ),
           ),
         ],

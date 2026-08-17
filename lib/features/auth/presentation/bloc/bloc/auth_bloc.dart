@@ -11,6 +11,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     on<LoginRequested>(_login);
     on<RegisterRequested>(_signUp);
+    on<LogoutRequested>(_logout);
   }
 
   Future<void> _login(
@@ -55,4 +56,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
     }
   }
+  
+  Future<void> _logout(
+    LogoutRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+
+    try {
+      await repository.logout();
+      emit(AuthUnauthenticated());
+    } catch (e) {
+      emit(
+        AuthFailure(e.toString()),
+      );
+    }
+  }
+
+
 }

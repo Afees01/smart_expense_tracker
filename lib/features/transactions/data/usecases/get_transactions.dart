@@ -1,4 +1,4 @@
-import 'package:smart_expense_tracker/shared/models/transaction_model.dart';
+import 'package:smart_expense_tracker/features/transactions/data/models/transaction_model.dart';
 import '../../presentation/repositories/transaction_repository.dart';
 
 class GetTransactions {

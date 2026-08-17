@@ -19,4 +19,8 @@ class AuthRepository {
   ) {
     return dataSource.register(name, email, password);
   }
+
+  Future<void> logout() {
+    return dataSource.logout();
+  } 
 }

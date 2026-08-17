@@ -2,13 +2,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'budget_event.dart';
 import 'budget_state.dart';
-import 'package:smart_expense_tracker/shared/models/budget_model.dart';
+
+import 'package:smart_expense_tracker/features/budgets/presentation/repositories/budget_repository.dart';
 
 class BudgetBloc extends Bloc<BudgetEvent, BudgetState> {
-  BudgetBloc() : super(BudgetInitial()) {
+  final BudgetRepository repository;
+
+  BudgetBloc({
+    required this.repository,
+  }) : super(BudgetInitial()) {
     on<LoadBudgets>(_onLoadBudgets);
     on<AddBudget>(_onAddBudget);
   }
+
+  // ============================================================
+  // LOAD BUDGETS
+  // ============================================================
 
   Future<void> _onLoadBudgets(
     LoadBudgets event,
@@ -17,12 +26,14 @@ class BudgetBloc extends Bloc<BudgetEvent, BudgetState> {
     emit(BudgetLoading());
 
     try {
-      await Future.delayed(
-        const Duration(seconds: 1),
+      final budgets = await repository.getbudget(
+        month: event.month,
       );
 
       emit(
-        BudgetLoadSuccess(sampleBudgets),
+        BudgetLoadSuccess(
+          budgets,
+        ),
       );
     } catch (e) {
       emit(
@@ -33,17 +44,23 @@ class BudgetBloc extends Bloc<BudgetEvent, BudgetState> {
     }
   }
 
+  // ============================================================
+  // ADD BUDGET
+  // ============================================================
+
   void _onAddBudget(
     AddBudget event,
     Emitter<BudgetState> emit,
   ) {
     if (state is BudgetLoadSuccess) {
-      final current =
-          (state as BudgetLoadSuccess).budgets;
+      final current = (state as BudgetLoadSuccess).budgets;
 
       emit(
         BudgetLoadSuccess(
-          [...current, event.budget],
+          [
+            ...current,
+            event.budget,
+          ],
         ),
       );
     }
